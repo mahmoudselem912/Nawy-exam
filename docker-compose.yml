@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: nawy_database
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourPassword1234
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+
+  backend:
+    build:
+      context: ./node-server
+      dockerfile: Dockerfile
+    container_name: nawy_backend
+    environment:
+      - DATABASE_URL=sqlserver://localhost:1433;database=Nawy;user=sa;password=1234;trustServerCertificate=true
+    depends_on:
+      - database
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build:
+      context: ./apartment-frontend
+      dockerfile: Dockerfile
+    container_name: nawy_frontend
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.local
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  sqlserverdata:

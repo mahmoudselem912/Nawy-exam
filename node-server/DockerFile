@@ -1,0 +1,23 @@
+# Use the official Node.js image with Alpine Linux as a base
+FROM node:16-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json (if available) to install dependencies
+COPY package*.json ./
+
+# Install npm dependencies
+RUN npm install
+
+# Copy the rest of your application code to the container
+COPY . .
+
+# Build your Nest.js application (if necessary)
+RUN npm run build
+
+# Expose the port that your Nest.js application runs on
+EXPOSE 4000
+
+# Command to run your Nest.js application using npm
+CMD ["npm", "run", "start:dev"]
